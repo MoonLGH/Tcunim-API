@@ -18,9 +18,17 @@ APIRouter.get("/getExtensions", function(req:Express.Request, res:Express.Respon
 
 APIRouter.get("/extension", function(req:Express.Request, res:Express.Response) {
   const {extension} = req.query;
-  import(path.join(process.cwd(), `./dist/extensions/${extension}.js`)).then(res.status(200).send.bind(res)).catch((err) =>{
+  import(path.join(process.cwd(), `./dist/extensions/${(extension as string).toLowerCase()}.js`)).then(res.status(200).send.bind(res)).catch((err) =>{
     res.status(500).send(err);
   });
 });
 
+APIRouter.get("/getHome", function(req:Express.Request, res:Express.Response) {
+  const {provider} = req.query;
+  import(path.join(process.cwd(), `./dist/extensions/${(provider as string).toLowerCase()}.js`)).then((res) =>{
+    res.getHome().then(res.status(200).send.bind(res));
+  }).catch((err) =>{
+    res.status(500).send(err);
+  });
+});
 export {APIRouter};
