@@ -29,12 +29,20 @@ interface detailAnime {
 interface Episode {
     title: string;
     url: string;
+    date: string;
 }
+
 
 interface EpsWatch {
+    next?:string;
+    prev?:string;
+    video: Video[];
+  }
+  
+  interface Video {
     url: string;
-}
-
+    Quality: string;
+  }
 // export async function getHome():Promise<homePage[]> {} // returnhomePage
 // export async function search(q:string):Promise<Anime[]> {} // return Anime[]
 // export async function detail(id:string):Promise<detailAnime> {}

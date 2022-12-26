@@ -40,4 +40,22 @@ APIRouter.get("/search", function(req:Express.Request, res:Express.Response) {
     res.status(500).send(err);
   });
 });
+
+APIRouter.get("/detail", function(req:Express.Request, res:Express.Response) {
+  const {provider, id} = req.query;
+  import(path.join(process.cwd(), `./dist/extensions/${(provider as string).toLowerCase()}.js`)).then((resp) =>{
+    resp.detail(id).then(res.status(200).send.bind(res));
+  }).catch((err) =>{
+    res.status(500).send(err);
+  });
+});
+
+APIRouter.get("/watch", function(req:Express.Request, res:Express.Response) {
+  const {provider, id} = req.query;
+  import(path.join(process.cwd(), `./dist/extensions/${(provider as string).toLowerCase()}.js`)).then((resp) =>{
+    resp.watch(id).then(res.status(200).send.bind(res));
+  }).catch((err) =>{
+    res.status(500).send(err);
+  });
+});
 export {APIRouter};
