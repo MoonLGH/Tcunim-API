@@ -43,8 +43,8 @@ interface Video {
   quality: string;
 }
 
-export async function getHome(): Promise<homePage> {
-  const OngoingData = await axios.get(baseUrl + "ongoing-anime/", {
+export async function getHome(page="1"): Promise<homePage> {
+  const OngoingData = await axios.get(baseUrl + `ongoing-anime/page/${page}`, {
     headers: {"Accept-Encoding": "gzip,deflate,compress"},
   });
 
@@ -68,7 +68,7 @@ export async function getHome(): Promise<homePage> {
     });
   });
 
-  const popularData = await axios.get(baseUrl + "complete-anime/", {
+  const popularData = await axios.get(baseUrl + `complete-anime/page/${page}`, {
     headers: {"Accept-Encoding": "gzip,deflate,compress"},
   });
 
@@ -98,9 +98,9 @@ export async function getHome(): Promise<homePage> {
   };
 }
 
-export async function search(q: string) {
+export async function search(q: string, page="1") {
   const searchData = await axios.get(
-      baseUrl + `?s=${q.split(" ").join("+")}&post_type=anime`,
+      baseUrl + `/page/${page}/?s=${q.split(" ").join("+")}&post_type=anime`,
       {
         headers: {"Accept-Encoding": "gzip,deflate,compress"},
       },
@@ -156,7 +156,7 @@ export async function detail(id: string): Promise<detailAnime> {
   ).attr("src")!;
   result.episodes = [];
   $("#venkonten > div.venser > div.episodelist").each((i, el) => {
-    if ($(el).find("div").text().includes("batch")) return;
+    if ($(el).find("div").text().toLowerCase().includes("batch")) return;
     $(el)
         .find("ul > li")
         .each((j, el2) => {

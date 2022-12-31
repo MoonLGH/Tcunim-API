@@ -24,18 +24,18 @@ APIRouter.get("/extension", function(req:Express.Request, res:Express.Response) 
 });
 
 APIRouter.get("/menu", function(req:Express.Request, res:Express.Response) {
-  const {provider} = req.query;
+  const {provider, page} = req.query;
   import(path.join(process.cwd(), `./dist/extensions/${(provider as string).toLowerCase()}.js`)).then((resp) =>{
-    resp.getHome().then(res.status(200).send.bind(res));
+    resp.getHome(page).then(res.status(200).send.bind(res));
   }).catch((err) =>{
     res.status(500).send(err);
   });
 });
 
 APIRouter.get("/search", function(req:Express.Request, res:Express.Response) {
-  const {provider, q} = req.query;
+  const {provider, q, page} = req.query;
   import(path.join(process.cwd(), `./dist/extensions/${(provider as string).toLowerCase()}.js`)).then((resp) =>{
-    resp.search(q).then(res.status(200).send.bind(res));
+    resp.search(q, page).then(res.status(200).send.bind(res));
   }).catch((err) =>{
     res.status(500).send(err);
   });
