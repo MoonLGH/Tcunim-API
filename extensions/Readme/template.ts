@@ -34,10 +34,22 @@ interface Episode {
 
 
 interface EpsWatch {
+    title: string;
     next?:string;
     prev?:string;
     video: Video[];
-  }
+    downloads: download[]
+}
+
+interface download {
+  quality: string;
+  links: linkDownload[]
+}
+
+interface linkDownload {
+  provider: string;
+  url: string;
+}
   
   interface Video {
     url: string;

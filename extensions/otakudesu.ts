@@ -33,9 +33,21 @@ interface Episode {
 }
 
 interface EpsWatch {
+  title: string;
   next?: string;
   prev?: string;
   video: Video[];
+  downloads: download[]
+}
+
+interface download {
+  quality: string;
+  links: linkDownload[]
+}
+
+interface linkDownload {
+  provider: string;
+  url: string;
 }
 
 interface Video {
@@ -184,32 +196,35 @@ export async function watch(id: string): Promise<EpsWatch> {
       "#venkonten > div.venser > div.venutama > div.prevnext > div.flir > a",
   ).each((i, el) => {
     if ($(el).text().toLowerCase().includes("prev")) {
-      prev = $(el).attr("href");
+      prev = $(el).attr("href")?.split("/episode/")[1];
     } else if ($(el).text().toLowerCase().includes("next")) {
-      next = $(el).attr("href");
+      next = $(el).attr("href")?.split("/episode/")[1];
     }
   });
+
+  const title = $("#venkonten > div.venser > div.venutama > h1").text();
 
   const videos:Video[] = [];
 
   const elements = $(
-      "#venkonten > div.venser > div.venutama > div.download > ul > li > a:nth-child(2)",
+      "#venkonten > div.venser > div.venutama > div.download > ul > li",
   );
+
+  const downloads:download[] = [];
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
-    let quality = "";
-    const url = await parse($(element).attr("href")!);
-    if (url.includes("360")) {
-      quality = "360p";
-    } else if (url.includes("480")) {
-      quality = "480p";
-    } else if (url.includes("720")) {
-      quality = "720p";
-    } else if (url.includes("1080")) {
-      quality = "1080p";
-    } else {
-      quality = "UNKNOWN";
-    }
+    const url = await parse($(element).find("a:nth-child(2)").attr("href")!);
+    const quality = $(element).find("strong").text();
+    const downloadList:linkDownload[] = [];
+    $(element).find("a").each((i, el) => {
+      downloadList.push({provider: $(el).text(), url: $(el).attr("href")!});
+    });
+
+    downloads.push({
+      quality,
+      links: downloadList,
+    });
+
     videos.push({
       quality,
       url,
@@ -217,6 +232,8 @@ export async function watch(id: string): Promise<EpsWatch> {
   }
 
   return {
+    downloads,
+    title,
     prev,
     next,
     video: videos,
