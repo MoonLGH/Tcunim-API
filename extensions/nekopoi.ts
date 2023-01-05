@@ -93,7 +93,7 @@ export async function search(q: string, page = "1") {
       result.push({
         title: element.title,
         thumbnail_url: element.thumb,
-        url: element.url,
+        url: element.url.split("/hentai/")[1],
         totalEps: "unknown",
       });
     }

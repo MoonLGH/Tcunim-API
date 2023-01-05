@@ -9,7 +9,7 @@
     "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.2",
-    "nekowrap": "^3.3.4",
+    "nekowrap": "^3.3.5",
     "node-fetch": "^3.2.0",
     "puppeteer": "^15.5.0",
     "puppeteer-extra": "^3.3.4",
