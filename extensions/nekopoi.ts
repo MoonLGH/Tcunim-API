@@ -146,7 +146,7 @@ export async function watch(id: string): Promise<EpsWatch> {
         ar.host.toLowerCase().includes("zippy"),
       )?.url;
       if (zs) {
-        zs = await parse(zs)
+        zs = await parse(zs);
         video.push({
           quality: element.title,
           url: zs,
