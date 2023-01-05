@@ -70,7 +70,7 @@ export async function getHome(page="1"): Promise<homePage> {
     const thumbnail_url = Latest$(el)
         .find("div > div.thumb > a > div > img")
         .attr("src")!;
-    const url = Latest$(el).find("div > div.thumb > a").attr("href")!;
+    const url = Latest$(el).find("div > div.thumb > a").attr("href")!.split("/anime/")[1];
     const totalEps = Latest$(el).find("div > div.epz").text()!;
     Latest.push({
       title: name,
@@ -94,7 +94,7 @@ export async function getHome(page="1"): Promise<homePage> {
     const thumbnail_url = Popular$(el)
         .find("div > div.thumb > a > div > img")
         .attr("src")!;
-    const url = Popular$(el).find("div > div.thumb > a").attr("href")!;
+    const url = Popular$(el).find("div > div.thumb > a").attr("href")!.split("/anime/")[1];
     const totalEps = Popular$(el).find("div > div.epz").text();
     Popular.push({
       title: name,
@@ -123,7 +123,7 @@ export async function search(q: string, page="1") {
   $("#venkonten > div > div.venser > div > div > ul > li").each((i, el) => {
     const name = $(el).find("h2").text()!;
     const thumbnail_url = $(el).find("img").attr("src")!;
-    const url = $(el).find("h2 > a").attr("href")!;
+    const url = $(el).find("h2 > a").attr("href")!.split("/anime/")[1];
     const texts: string[] = [];
     $(el)
         .find(".set")
@@ -172,7 +172,7 @@ export async function detail(id: string): Promise<detailAnime> {
     $(el)
         .find("ul > li")
         .each((j, el2) => {
-          const url = $(el2).find("a").attr("href")!;
+          const url = $(el2).find("a").attr("href")!.split("/episode/")[1];
           const title = $(el2).find("a").text();
           const date = $(el2).find("span.zeebr").text();
           result.episodes.push({
