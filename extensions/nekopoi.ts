@@ -136,29 +136,34 @@ export async function watch(id: string): Promise<EpsWatch> {
       }),
     });
     if (element.title.includes("360")) {
-      const prov = element.list.find((item) => item.provider.includes("ouo"));
-      const url = await client.Ouo(prov!.link);
-      console.log(url);
-      const downloads = await client.bypassMirrored(url!+"");
-      console.log(downloads);
-      dl.push({
-        quality: element.title + " BYPASSED",
-        links: downloads.map((dl) =>{
-          return {
-            provider: dl.host,
-            url: dl.url,
-          };
-        }),
-      });
-      let zs = downloads!.find((ar) =>
-        ar.host.toLowerCase().includes("zippy"),
-      )?.url;
-      if (zs) {
-        zs = await parse(zs);
-        video.push({
-          quality: element.title,
-          url: zs,
+      try {
+        const prov = element.list.find((item) => item.provider.includes("ouo"));
+        const url = await client.Ouo(prov!.link);
+        console.log(url);
+        const downloads = await client.bypassMirrored(url!+"");
+        console.log(downloads);
+        dl.push({
+          quality: element.title + " BYPASSED",
+          links: downloads.map((dl) =>{
+            return {
+              provider: dl.host,
+              url: dl.url,
+            };
+          }),
         });
+        let zs = downloads!.find((ar) =>
+          ar.host.toLowerCase().includes("zippy"),
+        )?.url;
+        if (zs) {
+          zs = await parse(zs);
+          video.push({
+            quality: element.title,
+            url: zs,
+          });
+        }
+      } catch (e) {
+        console.log("Error");
+        console.log(e);
       }
     }
   }
