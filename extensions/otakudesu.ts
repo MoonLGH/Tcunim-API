@@ -241,9 +241,13 @@ export async function watch(id: string): Promise<EpsWatch> {
 }
 
 async function parse(url: string) {
-  const res = (await axios.get(url, {
-    headers: {"Accept-Encoding": "gzip,deflate,compress"},
-  }));
+  const res = await axios.get(url, {
+    headers: {
+      "Accept-Encoding": "gzip,deflate,compress",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
+    },
+  });
+
   url = "https://" + res.data.split("\"text\": \"https://")[1].split("\"")[0];
   const $ = load(res.data);
   const scr = $("#dlbutton").parent().find("script").html()!;

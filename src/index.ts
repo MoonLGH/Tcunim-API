@@ -1,3 +1,5 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 import {start} from "./app/app.js";
 import fs from "fs";
 import path from "path";

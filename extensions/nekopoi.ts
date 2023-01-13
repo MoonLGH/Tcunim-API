@@ -141,7 +141,15 @@ export async function watch(id: string): Promise<EpsWatch> {
       console.log(url);
       const downloads = await client.bypassMirrored(url!+"");
       console.log(downloads);
-
+      dl.push({
+        quality: element.title + " BYPASSED",
+        links: downloads.map((dl) =>{
+          return {
+            provider: dl.host,
+            url: dl.url,
+          };
+        }),
+      });
       let zs = downloads!.find((ar) =>
         ar.host.toLowerCase().includes("zippy"),
       )?.url;
