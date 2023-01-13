@@ -162,7 +162,12 @@ export async function watch(id: string): Promise<EpsWatch> {
           });
         }
       } catch (e) {
-        console.log("Error");
+        console.log("Error on ouo, throwing ouo on dl");
+        const link = element.list.find((item) => item.provider.includes("ouo"));
+        dl.push({
+          quality: element.title + "OUO-NEEDCORS",
+          links: [{provider: "OUO", url: link!.link}],
+        });
         console.log(e);
       }
     }
