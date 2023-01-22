@@ -138,7 +138,7 @@ export async function watch(id: string): Promise<EpsWatch> {
     if (element.title.includes("360")) {
       try {
         const prov = element.list.find((item) => item.provider.includes("ouo"));
-        const url = await client.Ouo(prov!.link);
+        const url = await client.Ouo(prov!.link, 2);
         console.log(url);
         const downloads = await client.bypassMirrored(url!+"");
         console.log(downloads);
