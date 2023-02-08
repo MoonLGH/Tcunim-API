@@ -59,7 +59,7 @@ import {Client} from "nekowrap";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
-const client = new Client(puppeteer);
+const client = new Client(puppeteer,{ args: ['--no-sandbox', '--disable-setuid-sandbox'],ignoreDefaultArgs: ['--disable-extensions']  });
 export async function start() {
   await client.start();
   console.log("Client nekopoi is started");
