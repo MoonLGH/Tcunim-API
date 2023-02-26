@@ -241,6 +241,7 @@ export async function watch(id: string): Promise<EpsWatch> {
 }
 
 async function parse(url: string) {
+  console.log(url);
   const res = await axios.get(url, {
     headers: {
       "Accept-Encoding": "gzip,deflate,compress",
@@ -249,20 +250,12 @@ async function parse(url: string) {
   });
 
   url = "https://" + res.data.split("\"text\": \"https://")[1].split("\"")[0];
+  url = url.replace("/v/", "/d/").replace("/file.html", "");
   const $ = load(res.data);
-  const scr = $("#dlbutton").parent().find("script").html()!;
-  let link = url.substring(0, url.indexOf("/v/"));
-  const firstString = scr!.substring(
-    scr!.indexOf(" = \"") + 4,
-    scr!.indexOf("\" + ("),
-  );
-  const num = parseInt(scr.split("+ (")[1].split("%")[0]);
-  console.log(num);
-  const lastString = scr!.substring(
-    scr!.indexOf("913) + \"") + 8,
-    scr!.indexOf("\";"),
-  );
-  const nums = (num % 51245 + num % 913);
-  link += firstString + nums.toString() + lastString;
+  const scr = $("body").html()!;
+  const num = parseInt(scr.match(/.omg = (\d+)%78956/)![1]);
+  const lastStr = scr.match(/\+"(.+?)"/);
+  const link = url+ "/" + (num+18) + lastStr![1];
+  console.log(link);
   return link;
 }
