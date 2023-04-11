@@ -1,10 +1,10 @@
 export const name = "Nekopoi";
 export const lang = "ID";
 const baseUrl = "https://otakudesu.bid/";
+import {extract} from "./util/extractor/9xbuddy.js";
 export const url = baseUrl;
 export const nsfw = true;
 import axios from "axios";
-import {load} from "cheerio";
 
 interface Anime {
   title: string;
@@ -59,7 +59,7 @@ import {Client} from "nekowrap";
 import puppeteer from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
 puppeteer.use(StealthPlugin());
-const client = new Client(puppeteer,{ args: ['--no-sandbox', '--disable-setuid-sandbox'],ignoreDefaultArgs: ['--disable-extensions']  });
+const client = new Client(puppeteer, {args: ["--no-sandbox", "--disable-setuid-sandbox"], ignoreDefaultArgs: ["--disable-extensions"]});
 export async function start() {
   await client.start();
   console.log("Client nekopoi is started");
@@ -151,15 +151,19 @@ export async function watch(id: string): Promise<EpsWatch> {
             };
           }),
         });
-        let zs = downloads!.find((ar) =>
-          ar.host.toLowerCase().includes("zippy"),
+        let zs:string|undefined|null = downloads!.find((ar) =>
+          ar.host.toLowerCase().includes("racaty"),
         )?.url;
         if (zs) {
-          zs = await parse(zs);
-          video.push({
-            quality: element.title,
-            url: zs,
+          zs = await parse(zs).catch(()=>{
+            return null;
           });
+          if (zs) {
+            video.push({
+              quality: element.title,
+              url: zs,
+            });
+          }
         }
       } catch (e) {
         console.log("Error on ouo, throwing ouo on dl");
@@ -180,16 +184,15 @@ export async function watch(id: string): Promise<EpsWatch> {
 }
 
 async function parse(url: string) {
-  const res = await axios.get(url, {
-    headers: {"Accept-Encoding": "gzip,deflate,compress"},
-  });
-  url = "https://" + res.data.split("\"text\": \"https://")[1].split("\"")[0];
-  url = url.replace("/v/", "/d/").replace("/file.html", "");
-  const $ = load(res.data);
-  const scr = $("body").html()!;
-  const num = parseInt(scr.match(/.omg = (\d+)%78956/)![1]);
-  const lastStr = scr.match(/\+"(.+?)"/);
-  const link = url+ "/" + (num+18) + lastStr![1];
-  console.log(link);
-  return link;
+  console.log(url);
+  const res = await axios.get(url);
+  if (res.request._redirectable._redirectCount > 0) {
+    const redirectUrl = res.request._redirectable._currentUrl;
+    url = redirectUrl;
+  }
+
+  const data = await extract(url);
+
+  console.log(data);
+  return data.find((a) => a.endsWith(".mp4"));
 }

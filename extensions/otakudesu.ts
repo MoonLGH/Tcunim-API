@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import axios from "axios";
 import {load} from "cheerio";
+import {extract} from "./util/extractor/9xbuddy.js";
 export const name = "Otakudesu";
 export const lang = "ID";
 const baseUrl = "https://otakudesu.bid/";
@@ -213,22 +214,29 @@ export async function watch(id: string): Promise<EpsWatch> {
   const downloads:download[] = [];
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
-    const url = await parse($(element).find("a:nth-child(2)").attr("href")!);
-    const quality = $(element).find("strong").text();
-    const downloadList:linkDownload[] = [];
-    $(element).find("a").each((i, el) => {
-      downloadList.push({provider: $(el).text(), url: $(el).attr("href")!});
-    });
+    const url = (await parse($(element).find("a").filter(function() {
+      // eslint-disable-next-line no-invalid-this
+      return $(this).text().trim().toLowerCase() === "racaty";
+    }).attr("href")!).catch(()=>{
+      return null;
+    }));
+    if (url && typeof url === "string") {
+      const quality = $(element).find("strong").text();
+      const downloadList:linkDownload[] = [];
+      $(element).find("a").each((i, el) => {
+        downloadList.push({provider: $(el).text(), url: $(el).attr("href")!});
+      });
 
-    downloads.push({
-      quality,
-      links: downloadList,
-    });
+      downloads.push({
+        quality,
+        links: downloadList,
+      });
 
-    videos.push({
-      quality,
-      url,
-    });
+      videos.push({
+        quality,
+        url,
+      });
+    }
   }
 
   return {
@@ -242,20 +250,14 @@ export async function watch(id: string): Promise<EpsWatch> {
 
 async function parse(url: string) {
   console.log(url);
-  const res = await axios.get(url, {
-    headers: {
-      "Accept-Encoding": "gzip,deflate,compress",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.82 Safari/537.36",
-    },
-  });
+  const res = await axios.get(url);
+  if (res.request._redirectable._redirectCount > 0) {
+    const redirectUrl = res.request._redirectable._currentUrl;
+    url = redirectUrl;
+  }
 
-  url = "https://" + res.data.split("\"text\": \"https://")[1].split("\"")[0];
-  url = url.replace("/v/", "/d/").replace("/file.html", "");
-  const $ = load(res.data);
-  const scr = $("body").html()!;
-  const num = parseInt(scr.match(/.omg = (\d+)%78956/)![1]);
-  const lastStr = scr.match(/\+"(.+?)"/);
-  const link = url+ "/" + (num+18) + lastStr![1];
-  console.log(link);
-  return link;
+  const data = await extract(url);
+
+  console.log(data);
+  return data.find((a) => a.endsWith(".mp4"));
 }

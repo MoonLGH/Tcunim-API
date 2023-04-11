@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { load } from 'cheerio';
 
-
 const headers = {
   'origin': 'https://9xbuddy.xyz',
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36',
@@ -9,7 +8,7 @@ const headers = {
   'x-requested-with': 'xmlhttprequest'
 };
 
-test("https://racaty.io/asslnc57ncii")
+test("https://www.youtube.com/watch?v=LLhZ2SuWzlw&list=RDMM&index=8")
 
 async function test(url) {
   let data = await axios.get("https://9xbuddy.xyz/process?url="+encodeURIComponent(url),{
@@ -33,9 +32,7 @@ async function test(url) {
     headers
   });
 
-  // console.log(postResponse.data)
-  doDecrpyt(postResponse.data, css)
-  // console.log(postResponse.data.response.formats)
+  return doDecrpyt(postResponse.data, css)
 }
 
 function doDecrpyt(data,css){
@@ -79,6 +76,8 @@ function ord(e) {
 }
 
 function decrypt(e, t) {
+  console.log(e)
+  console.log(t)
   var r = ''
   e = decode64(e)
   for (var n = 0; n < e.length; n++) {
@@ -99,6 +98,7 @@ function decode64(e) {
       r,
       n = 0,
       s = []
+      console.log(r)
     for (e = e.replace(/=/g, ''); n < e.length; ) {
       switch (
         ((t =
@@ -155,29 +155,46 @@ function getcss(data){
 }
 
 function encode64(e) {
-  if (/([^\u0000-\u00ff])/.test(e))
-      throw new Error("Can't base64 encode non-ASCII characters.");
-  for (var t, r, n, s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", a = 0, c = []; a < e.length; ) {
-      switch (t = e.charCodeAt(a),
-      n = a % 3) {
-      case 0:
-          c.push(s.charAt(t >> 2));
-          break;
-      case 1:
-          c.push(s.charAt((3 & r) << 4 | t >> 4));
-          break;
-      case 2:
-          c.push(s.charAt((15 & r) << 2 | t >> 6)),
-          c.push(s.charAt(63 & t))
-      }
-      r = t,
-      a++
+  if (/([^\u0000-\u00ff])/.test(e)) {
+    throw new Error("Can't base64 encode non-ASCII characters.");
   }
-  return 0 == n ? (c.push(s.charAt((3 & r) << 4)),
-  c.push("==")) : 1 == n && (c.push(s.charAt((15 & r) << 2)),
-  c.push("=")),
-  c.join("")
+
+  const s = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+  let t, r = 0, n = 0;
+  const c = [];
+
+  for (let a = 0; a < e.length; a++) {
+    t = e.charCodeAt(a);
+    n = a % 3;
+
+    switch (n) {
+      case 0:
+        c.push(s.charAt(t >> 2));
+        break;
+      case 1:
+        c.push(s.charAt((3 & r) << 4 | t >> 4));
+        break;
+      case 2:
+        c.push(s.charAt((15 & r) << 2 | t >> 6));
+        c.push(s.charAt(63 & t));
+        break;
+    }
+
+    r = t;
+  }
+
+  if (n === 0) {
+    c.push(s.charAt((3 & r) << 4));
+    c.push("==");
+  } else if (n === 1) {
+    c.push(s.charAt((15 & r) << 2));
+    c.push("=");
+  }
+
+  return c.join("");
 }
+
 
 function encrypt(e, t) {
   for (var r = "", n = 0; n < e.length; n++) {
