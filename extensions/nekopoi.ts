@@ -1,10 +1,9 @@
 export const name = "Nekopoi";
 export const lang = "ID";
-const baseUrl = "https://otakudesu.bid/";
-import {extract} from "./util/extractor/9xbuddy.js";
+const baseUrl = "https://nekopoi.care/";
+import {extract} from "./util/extractor/racaty.js";
 export const url = baseUrl;
 export const nsfw = true;
-import axios from "axios";
 
 interface Anime {
   title: string;
@@ -185,14 +184,5 @@ export async function watch(id: string): Promise<EpsWatch> {
 
 async function parse(url: string) {
   console.log(url);
-  const res = await axios.get(url);
-  if (res.request._redirectable._redirectCount > 0) {
-    const redirectUrl = res.request._redirectable._currentUrl;
-    url = redirectUrl;
-  }
-
-  const data = await extract(url);
-
-  console.log(data);
-  return data.find((a) => a.endsWith(".mp4"));
+  return (await extract(url)).url;
 }

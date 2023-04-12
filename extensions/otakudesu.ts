@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import axios from "axios";
 import {load} from "cheerio";
-import {extract} from "./util/extractor/9xbuddy.js";
+import {extract} from "./util/extractor/racaty.js";
 export const name = "Otakudesu";
 export const lang = "ID";
 const baseUrl = "https://otakudesu.bid/";
@@ -217,7 +217,7 @@ export async function watch(id: string): Promise<EpsWatch> {
     const url = (await parse($(element).find("a").filter(function() {
       // eslint-disable-next-line no-invalid-this
       return $(this).text().trim().toLowerCase() === "racaty";
-    }).attr("href")!).catch(()=>{
+    }).attr("href")!).catch((e)=>{
       return null;
     }));
     if (url && typeof url === "string") {
@@ -249,15 +249,13 @@ export async function watch(id: string): Promise<EpsWatch> {
 }
 
 async function parse(url: string) {
-  console.log(url);
   const res = await axios.get(url);
   if (res.request._redirectable._redirectCount > 0) {
     const redirectUrl = res.request._redirectable._currentUrl;
     url = redirectUrl;
   }
 
-  const data = await extract(url);
-
-  console.log(data);
-  return data.find((a) => a.endsWith(".mp4"));
+  console.log(url);
+  const data = (await extract(url)).url;
+  return data;
 }
