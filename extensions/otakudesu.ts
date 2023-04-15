@@ -66,7 +66,7 @@ export async function getHome(page="1"): Promise<homePage> {
 
   Latest$(
       "#venkonten > div > div.venser > div.venutama > div.rseries > div > div.venz > ul > li",
-  ).each((i, el) => {
+  ).each((_i, el) => {
     const name = Latest$(el).find("div > div.thumb > a > div > h2").text()!;
     const thumbnail_url = Latest$(el)
         .find("div > div.thumb > a > div > img")
@@ -90,7 +90,7 @@ export async function getHome(page="1"): Promise<homePage> {
 
   Popular$(
       "#venkonten > div > div.venser > div.venutama > div.rseries > div > div.venz > ul > li",
-  ).each((i, el) => {
+  ).each((_i, el) => {
     const name = Popular$(el).find("div > div.thumb > a > div > h2").text()!;
     const thumbnail_url = Popular$(el)
         .find("div > div.thumb > a > div > img")
@@ -121,14 +121,14 @@ export async function search(q: string, page="1") {
   const $ = load(searchData.data);
   const result: Anime[] = [];
 
-  $("#venkonten > div > div.venser > div > div > ul > li").each((i, el) => {
+  $("#venkonten > div > div.venser > div > div > ul > li").each((_i, el) => {
     const name = $(el).find("h2").text()!;
     const thumbnail_url = $(el).find("img").attr("src")!;
     const url = $(el).find("h2 > a").attr("href")!.split("/anime/")[1];
     const texts: string[] = [];
     $(el)
         .find(".set")
-        .each(function(i, el) {
+        .each(function(_i, el) {
           texts.push($(el).text());
         });
     const totalEps = texts.join("\n");
@@ -155,7 +155,7 @@ export async function detail(id: string): Promise<detailAnime> {
     episodes: [],
   };
   $("#venkonten > div.venser > div.fotoanime > div.infozin > div > p").each(
-      (i, el) => {
+      (_i, el) => {
         if ($(el).text().toLowerCase().includes("judul")) {
           result.title = $(el).text().split(":")[1]!;
         }
@@ -168,11 +168,11 @@ export async function detail(id: string): Promise<detailAnime> {
       "#venkonten > div.venser > div.fotoanime > img",
   ).attr("src")!;
   result.episodes = [];
-  $("#venkonten > div.venser > div.episodelist").each((i, el) => {
+  $("#venkonten > div.venser > div.episodelist").each((_i, el) => {
     if ($(el).find("div").text().toLowerCase().includes("batch")) return;
     $(el)
         .find("ul > li")
-        .each((j, el2) => {
+        .each((_j, el2) => {
           const url = $(el2).find("a").attr("href")!.split("/episode/")[1];
           const title = $(el2).find("a").text();
           const date = $(el2).find("span.zeebr").text();
@@ -195,7 +195,7 @@ export async function watch(id: string): Promise<EpsWatch> {
   let next;
   $(
       "#venkonten > div.venser > div.venutama > div.prevnext > div.flir > a",
-  ).each((i, el) => {
+  ).each((_i, el) => {
     if ($(el).text().toLowerCase().includes("prev")) {
       prev = $(el).attr("href")?.split("/episode/")[1];
     } else if ($(el).text().toLowerCase().includes("next")) {
@@ -217,15 +217,17 @@ export async function watch(id: string): Promise<EpsWatch> {
     const url = (await parse($(element).find("a").filter(function() {
       // eslint-disable-next-line no-invalid-this
       return $(this).text().trim().toLowerCase() === "racaty";
-    }).attr("href")!).catch((e)=>{
+    }).attr("href")!).catch(()=>{
       return null;
     }));
+    const downloadList:linkDownload[] = [];
+    $(element).find("a").each((_i, el) => {
+      downloadList.push({provider: $(el).text(), url: $(el).attr("href")!});
+    });
+
     if (url && typeof url === "string") {
       const quality = $(element).find("strong").text();
-      const downloadList:linkDownload[] = [];
-      $(element).find("a").each((i, el) => {
-        downloadList.push({provider: $(el).text(), url: $(el).attr("href")!});
-      });
+
 
       downloads.push({
         quality,
