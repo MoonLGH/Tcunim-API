@@ -225,20 +225,18 @@ export async function watch(id: string): Promise<EpsWatch> {
       downloadList.push({provider: $(el).text(), url: $(el).attr("href")!});
     });
 
+    const quality = $(element).find("strong").text();
+
     if (url && typeof url === "string") {
-      const quality = $(element).find("strong").text();
-
-
-      downloads.push({
-        quality,
-        links: downloadList,
-      });
-
       videos.push({
         quality,
         url,
       });
     }
+    downloads.push({
+      quality,
+      links: downloadList,
+    });
   }
 
   return {
