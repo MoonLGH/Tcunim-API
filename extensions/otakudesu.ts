@@ -1,3 +1,4 @@
+/* eslint-disable no-extend-native */
 /* eslint-disable camelcase */
 /* eslint-disable @typescript-eslint/no-empty-function */
 import axios from "axios";
@@ -7,6 +8,7 @@ export const name = "Otakudesu";
 export const lang = "ID";
 const baseUrl = "https://otakudesu.bid/";
 export const url = baseUrl;
+
 
 interface Anime {
   title: string;
@@ -54,6 +56,7 @@ interface linkDownload {
 interface Video {
   url: string;
   quality: string;
+  iframe?: boolean;
 }
 
 export async function getHome(page="1"): Promise<homePage> {
@@ -185,6 +188,19 @@ export async function detail(id: string): Promise<detailAnime> {
   });
   return result;
 }
+
+
+async function DesuStream(body:string) {
+  const $ = load(body);
+  const desuStream = $(
+      ".player-embed > .responsive-embed-stream > iframe",
+  ).attr("src");
+
+  // getting desu video]
+  console.log(desuStream);
+  return desuStream;
+}
+
 export async function watch(id: string): Promise<EpsWatch> {
   const EpsData = await axios.get(baseUrl + `/episode/${id}`, {
     headers: {"Accept-Encoding": "gzip,deflate,compress"},
@@ -212,6 +228,19 @@ export async function watch(id: string): Promise<EpsWatch> {
   );
 
   const downloads:download[] = [];
+
+  const desuS = await DesuStream(EpsData.data).catch((e)=>{
+    console.log(e);
+    return null;
+  });
+
+  if (desuS) {
+    videos.push({
+      quality: "DESUSTREAM",
+      iframe: true,
+      url: desuS,
+    });
+  }
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
     const url = (await parse($(element).find("a").filter(function() {
