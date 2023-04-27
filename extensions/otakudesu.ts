@@ -6,7 +6,7 @@ import {load} from "cheerio";
 import {extract} from "./util/extractor/racaty.js";
 export const name = "Otakudesu";
 export const lang = "ID";
-const baseUrl = "https://otakudesu.bid/";
+const baseUrl = "https://otakudesu.lol/";
 export const url = baseUrl;
 
 
@@ -39,8 +39,14 @@ interface EpsWatch {
   title: string;
   next?: string;
   prev?: string;
+  more?: ListMore[];
   video: Video[];
   downloads: download[]
+}
+
+interface ListMore {
+  title: string;
+  id: string;
 }
 
 interface download {
@@ -207,6 +213,19 @@ export async function watch(id: string): Promise<EpsWatch> {
   });
   const $ = load(EpsData.data);
 
+  const more: ListMore[] = [];
+  $("#selectcog > option").each((_i, el) => {
+    const url = $(el).attr("value");
+    const title = $(el).text();
+    if (url) {
+      more.push({
+        title,
+        id: url.split("/episode/")[1],
+      });
+    }
+  });
+
+
   let prev;
   let next;
   $(
@@ -245,10 +264,11 @@ export async function watch(id: string): Promise<EpsWatch> {
     const element = elements[i];
     const url = (await parse($(element).find("a").filter(function() {
       // eslint-disable-next-line no-invalid-this
-      return $(this).text().trim().toLowerCase() === "racaty";
+      return $(this).text().toLowerCase().includes("racaty");
     }).attr("href")!).catch(()=>{
       return null;
     }));
+
     const downloadList:linkDownload[] = [];
     $(element).find("a").each((_i, el) => {
       downloadList.push({provider: $(el).text(), url: $(el).attr("href")!});
@@ -273,12 +293,15 @@ export async function watch(id: string): Promise<EpsWatch> {
     title,
     prev,
     next,
+    more,
     video: videos,
   };
 }
 
 async function parse(url: string) {
+  console.log("test",url)
   const res = await axios.get(url);
+  console.log(res.request._redirectable._redirectCount)
   if (res.request._redirectable._redirectCount > 0) {
     const redirectUrl = res.request._redirectable._currentUrl;
     url = redirectUrl;
