@@ -1,7 +1,7 @@
 export const name = "Nekopoi";
 export const lang = "ID";
 const baseUrl = "https://nekopoi.care/";
-import {extract} from "./util/extractor/racaty.js";
+import {extract} from "./util/extractor/krakenfiles.js";
 export const url = baseUrl;
 export const nsfw = true;
 
@@ -64,7 +64,13 @@ export async function start() {
   console.log("Client nekopoi is started");
   return;
 }
+
+let cacheGetHome: homePage;
+let iscached = false;
 export async function getHome(page = "1"): Promise<homePage> {
+  if (iscached === true) {
+    return cacheGetHome;
+  }
   const pop = await client.hentai(parseInt(page));
   const Popular = [];
   for (let i = 0; i < pop.length; i++) {
@@ -76,6 +82,15 @@ export async function getHome(page = "1"): Promise<homePage> {
       totalEps: "unknown",
     });
   }
+
+  cacheGetHome = {
+    latest: Popular,
+    popular: Popular,
+  };
+  iscached = true;
+  setTimeout(() => {
+    iscached = false;
+  }, 1000 * 60 * 3);
 
   return {
     latest: Popular,
@@ -137,7 +152,7 @@ export async function watch(id: string): Promise<EpsWatch> {
     if (element.title.includes("360")) {
       try {
         const prov = element.list.find((item) => item.provider.includes("ouo"));
-        const url = await client.Ouo(prov!.link);
+        const url = await client.Ouo(prov!.link, 2);
         console.log(url);
         const downloads = await client.bypassMirrored(url!+"");
         console.log(downloads);
@@ -151,7 +166,7 @@ export async function watch(id: string): Promise<EpsWatch> {
           }),
         });
         let zs:string|undefined|null = downloads!.find((ar) =>
-          ar.host.toLowerCase().includes("racaty"),
+          ar.host.toLowerCase().includes("krakenfiles"),
         )?.url;
         if (zs) {
           zs = await parse(zs).catch(()=>{
@@ -164,7 +179,9 @@ export async function watch(id: string): Promise<EpsWatch> {
             });
           }
         }
-      } catch (e) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e:any) {
+        console.log(e.message);
         console.log("Error on ouo, throwing ouo on dl");
         const link = element.list.find((item) => item.provider.includes("ouo"));
         dl.push({
@@ -184,5 +201,5 @@ export async function watch(id: string): Promise<EpsWatch> {
 
 async function parse(url: string) {
   console.log(url);
-  return (await extract(url)).url;
+  return (await extract(url));
 }

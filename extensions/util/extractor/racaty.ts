@@ -2,7 +2,7 @@ import axios from "axios";
 import cheerio from "cheerio";
 
 export async function extract(url:string) {
-  console.log(url)
+  console.log(url);
   url = url.replace(".net", ".io").replace("http://", "https://");
   const headers = {
     "referer": "https://racaty.io",
@@ -17,7 +17,7 @@ export async function extract(url:string) {
   const payload = "op=download2&id=" + _id + "&rand=&referer=&method_free=&method_premium=";
 
   const response = await axios.post(url, payload, {headers});
-  console.log(response.data)
+  console.log(response.data);
   const $ = cheerio.load(response.data);
   url = $("#uniqueExpirylink").attr("href")!.replace(" ", "%20");
   const filename = /\/\/.*\/.*\/(.*)/.exec(url)![1];

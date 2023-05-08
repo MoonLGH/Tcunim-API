@@ -4,6 +4,7 @@
 import axios from "axios";
 import {load} from "cheerio";
 import {extract} from "./util/extractor/racaty.js";
+import {extract as krakenExtract} from "./util/extractor/krakenfiles.js";
 export const name = "Otakudesu";
 export const lang = "ID";
 const baseUrl = "https://otakudesu.lol/";
@@ -264,6 +265,13 @@ export async function watch(id: string): Promise<EpsWatch> {
     const element = elements[i];
     const url = (await parse($(element).find("a").filter(function() {
       // eslint-disable-next-line no-invalid-this
+      return $(this).text().toLowerCase().includes("kfile");
+    }).attr("href")!).catch(()=>{
+      return null;
+    }));
+
+    const url2 = (await parse($(element).find("a").filter(function() {
+      // eslint-disable-next-line no-invalid-this
       return $(this).text().toLowerCase().includes("racaty");
     }).attr("href")!).catch(()=>{
       return null;
@@ -280,6 +288,12 @@ export async function watch(id: string): Promise<EpsWatch> {
       videos.push({
         quality,
         url,
+      });
+    }
+    if (url2 && typeof url2 === "string") {
+      videos.push({
+        quality,
+        url: url2,
       });
     }
     downloads.push({
@@ -299,15 +313,19 @@ export async function watch(id: string): Promise<EpsWatch> {
 }
 
 async function parse(url: string) {
-  console.log("test",url)
+  console.log("test", url);
   const res = await axios.get(url);
-  console.log(res.request._redirectable._redirectCount)
   if (res.request._redirectable._redirectCount > 0) {
     const redirectUrl = res.request._redirectable._currentUrl;
     url = redirectUrl;
   }
 
   console.log(url);
-  const data = (await extract(url)).url;
+  let data;
+  if (url.includes("racaty")) {
+    data = (await extract(url)).url;
+  } else if (url.includes("krakenfiles")) {
+    data = await krakenExtract(url);
+  }
   return data;
 }
